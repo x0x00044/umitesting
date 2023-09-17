@@ -958,7 +958,8 @@ int32_t cam_sensor_driver_cmd(struct cam_sensor_ctrl_t *s_ctrl,
 
 			if (rc < 0) {
 				CAM_ERR(CAM_SENSOR,
-					"cannot apply init settings");
+					"cannot apply init settings rc= %d",
+					rc);
 				delete_request(&s_ctrl->i2c_data.init_settings);
 				goto release_mutex;
 			}

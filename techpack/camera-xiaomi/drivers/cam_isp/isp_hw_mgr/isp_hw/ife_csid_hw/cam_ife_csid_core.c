@@ -503,11 +503,11 @@ static int cam_ife_csid_global_reset(struct cam_ife_csid_hw *csid_hw)
 		cam_io_w_mb(0x2, soc_info->reg_map[0].mem_base +
 			csid_reg->rdi_reg[i]->csid_rdi_cfg0_addr);
 
-	/* reset HW regs first, then SW */
-	rc = cam_ife_csid_reset_regs(csid_hw, true);
+	/* reset SW regs first, then HW */
+	rc = cam_ife_csid_reset_regs(csid_hw, false);
 	if (rc < 0)
 		goto end;
-	rc = cam_ife_csid_reset_regs(csid_hw, false);
+	rc = cam_ife_csid_reset_regs(csid_hw, true);
 	if (rc < 0)
 		goto end;
 
@@ -3237,6 +3237,7 @@ static int cam_ife_csid_reset_regs(
 	spin_lock_irqsave(&csid_hw->hw_info->hw_lock, flags);
 
 	csid_hw->is_resetting = true;
+
 	/* clear the top interrupt first */
 	cam_io_w_mb(1, soc_info->reg_map[0].mem_base +
 		csid_reg->cmn_reg->csid_top_irq_clear_addr);
@@ -3931,7 +3932,7 @@ irqreturn_t cam_ife_csid_irq(int irq_num, void *data)
 
 	if (csid_hw->is_resetting) {
 		CAM_DBG(CAM_ISP, "CSID:%d is resetting, IRQ Handling exit",
-		csid_hw->hw_intf->hw_idx);
+			csid_hw->hw_intf->hw_idx);
 		return IRQ_HANDLED;
 	}
 
